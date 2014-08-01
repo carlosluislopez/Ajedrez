@@ -4,7 +4,7 @@
     class Pieza
     {
         public int Id { set; get; }
-        public string Tipo { set; get; }
+        public int Tipo { set; get; }
         public ColorFicha Color { set; get; }
     }
 }

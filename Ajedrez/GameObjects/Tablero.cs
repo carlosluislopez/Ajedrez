@@ -9,14 +9,20 @@ namespace Ajedrez.GameObjects
 
         public class Tablero
         {
+            private readonly Dictionary<int, string> _filaLetraDictionary = new Dictionary<int, string>
+            {
+                {1,"A"},{2,"B"},{3,"C"},{4,"D"},{5,"E"},{6,"F"},{7,"G"},{8,"H"}
+            };
+            private readonly Dictionary<int, string> _piezasDictionary = new Dictionary<int, string>
+            {
+                {0, "Peon"},{1, "Torre"},{2, "Caballero"},{3, "Alfil"},{4, "Reina"},{5, "Rey"}
+            };
             private const int MaxCasillas = 64;
             private const int MaxFichas = 24;
             private const int MaxFilas = 8;
             private const int MaxColumnas = 8;
-            private readonly Dictionary<int,string> _filaLetraDictionary = new Dictionary<int, string>
-            {
-                {1,"A"},{2,"B"},{3,"C"},{4,"D"},{5,"E"},{6,"F"},{7,"G"},{8,"H"}
-            };
+            private int PiezaContador = 0;
+            
             private List<Pieza> _piezas;
             private List<Casilla> _casillas;
 
@@ -27,48 +33,21 @@ namespace Ajedrez.GameObjects
 
                 CrearCasillas();
                 LlenarCasillas();
-                /*for (var i = 0; i < MaxCasillas; i++)
-                {
-                    var newCasilla = new Casilla();
-                    newCasilla.Columna = tempColumna;
-                    newCasilla.Fila = _filaLetraDictionary[tempFila];
-                    newCasilla.Color = tempColor;
-                    newCasilla.Id = i;
-                    _casillas.Add(newCasilla);
-
-                    tempColumna++;
-
-                    if (tempFila <= 3 && tempColor == ColorCasilla.Negro)
-                    {
-                        var newPieza = new Pieza();
-                        Casilla.PiezaContenida = newPieza;
-                        newPieza.Id = _piezas.Count;
-                        newPieza.Color = ColorFicha.Negro;
-                        _piezas.Add(newPieza);
-                    }
-
-                    if (tempFila >= 6 && tempColor == ColorCasilla.Negro)
-                    {
-                        var newFicha = new Ficha();
-                        newFicha.CasillaActual = newCasilla;
-                        newFicha.ID = _fichas.Count;
-                        newFicha.Color = ColorFicha.Blanco;
-                        _fichas.Add(newFicha);
-                    }
-
-                    if (tempColumna > MaxColumnas)
-                    {
-                        tempFila += 1;
-                        tempColumna = 1;
-                    }
-                    else
-                        tempColor = (tempColor == ColorCasilla.Negro) ? ColorCasilla.Blanco : ColorCasilla.Negro;
-                }*/
-
+               //
             }
 
             private void LlenarCasillas()
             {
+                foreach (var casilla in _casillas)
+                {
+                    InitialPosition(casilla);
+                }
+            }
+
+            private void InitialPosition(Casilla casilla)
+            {
+                //Colocar la pieza correcta en la casilla.
+                //El contador de piezas provee el ID
                 throw new NotImplementedException();
             }
 
@@ -86,7 +65,7 @@ namespace Ajedrez.GameObjects
                                 {
                                     Color = tempColor,
                                     Columna = columna,
-                                    Fila = _filaLetraDictionary[fila]
+                                    Fila = fila
                                 }
                             );
                         tempColor = tempColor == ColorCasilla.Negro ? ColorCasilla.Blanco : ColorCasilla.Negro;
@@ -133,21 +112,24 @@ namespace Ajedrez.GameObjects
                     return false;
 
                 return true;
-            }
+            }*/
 
-            private Pieza ObtenerFichaDeCasilla(int idCasilla)
+            private Pieza GetPiezaDeCasilla(int idCasilla)
             {
-                var fichas = _piezas.AsEnumerable().Where(x => x.CasillaActual != null && x.CasillaActual.ID == idCasilla).ToArray();
-                if (!fichas.Any())
-                    return null;
-
+                var piezas = _casillas.AsEnumerable().Where(x => x.PiezaContenida != null).ToArray();
+                return piezas.Any() ? piezas.ElementAt(0).PiezaContenida : null;
                 //SI una casilla tiene mas de 1 ficha, hay un ERROR
-                if (fichas.Any())
-                    return fichas.ElementAt(0);
-
-                return null;
             }
-
+            private Pieza GetPiezaDeCasilla(int fila, int columna)
+            {
+                return GetPiezaDeCasilla(GetCasillaDeCoordenada(fila,columna).Id);
+            }
+            private Casilla GetCasillaDeCoordenada(int fila, int columna)
+            {
+                var casillas = _casillas.AsEnumerable().Where(casilla => casilla.Columna == fila && casilla.Fila == columna).ToArray();
+                return casillas.Any() ? casillas.ElementAt(0): null;
+            }
+            /*
             private Casilla ObtenerCasilla(int idCasilla)
             {
                 var casilla = _casillas.AsEnumerable().Where(x => x.ID.Equals(idCasilla)).ToArray();

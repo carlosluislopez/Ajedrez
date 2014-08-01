@@ -5,8 +5,8 @@
     {
         public int Id { set; get; }
         public ColorCasilla Color { set; get; }
-        public string Fila { set; get; }
+        public int Fila { set; get; }
         public int Columna { set; get; }
-        public static Pieza PiezaContenida { get; set; }
+        public Pieza PiezaContenida { get; set; }
     }
 }
