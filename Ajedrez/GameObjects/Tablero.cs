@@ -122,12 +122,16 @@ namespace Ajedrez.GameObjects
             }
             private Pieza GetPiezaDeCasilla(int fila, int columna)
             {
-                return GetPiezaDeCasilla(GetCasillaDeCoordenada(fila,columna).Id);
+                return GetPiezaDeCasilla(GetCasilla(fila,columna).Id);
             }
-            private Casilla GetCasillaDeCoordenada(int fila, int columna)
+            private Casilla GetCasilla(int fila, int columna)
             {
                 var casillas = _casillas.AsEnumerable().Where(casilla => casilla.Columna == fila && casilla.Fila == columna).ToArray();
-                return casillas.Any() ? casillas.ElementAt(0): null;
+                return casillas.Any() ? casillas[0]: null;
+            }
+            private Casilla GetCasilla(int id)
+            {
+                return _casillas.Find(casilla => casilla.Id == id);
             }
             /*
             private Casilla ObtenerCasilla(int idCasilla)
