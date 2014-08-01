@@ -1,1 +1,2 @@
 c:\users\moriya shrine\documents\visual studio 2013\Projects\Ajedrez\Ajedrez\bin\Debug\Ajedrez.exe.config
+C:\Users\Moriya Shrine\Desktop\AyDdS\Ajedrez\Ajedrez\Ajedrez\bin\Debug\Ajedrez.exe.config
