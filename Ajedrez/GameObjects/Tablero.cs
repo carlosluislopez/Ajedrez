@@ -7,6 +7,10 @@ using System.Threading.Tasks;
 namespace Ajedrez.GameObjects
 {
 
+    public enum ErrorCode
+    {
+        NoError,OutOfBounds,InvalidMove,CancelledMove
+    }
         public class Tablero
         {
             private readonly Dictionary<int, string> _filaLetraDictionary = new Dictionary<int, string>
@@ -73,51 +77,12 @@ namespace Ajedrez.GameObjects
                 }
 
             }
-            /*
-            private bool PermiteMover(int idCasillaAMover, Pieza fichaAMover)
-            {
-                //Validar que la casilla donde se quiere mover no exceda los limites del tablero
-                if (idCasillaAMover < 0 || idCasillaAMover >= MaxCasillas)
-                    return false;
-
-                var tempCasilla = ObtenerCasilla(idCasillaAMover);
-                if (tempCasilla == null)
-                    return false;
-
-                //Valida que la casilla donde se quiere mover sea siempre color NEGRO
-                if (tempCasilla.Color == ColorCasilla.Blanco)
-                    return false;
-
-                //Valida que la fila a donde se quiere mover, se la que corresponde, segun la ficha.
-                if (fichaAMover.Color == ColorFicha.Negro)
-                {
-                    if (tempCasilla.Fila != fichaAMover.CasillaActual.Fila + 1)
-                        return false;
-                }
-                else
-                {
-                    if (tempCasilla.Fila != fichaAMover.CasillaActual.Fila - 1)
-                        return false;
-                }
-
-                var ficha = ObtenerFichaDeCasilla(idCasillaAMover);
-                if (ficha == null)
-                    return true;
-
-                //Si la ficha que esta en la casilla es del mismo color que la que se quiere mover, no se permite movimiento
-                if (ficha.Color == fichaAMover.Color)
-                    return false;
-
-                if (ficha.DeadLock)
-                    return false;
-
-                return true;
-            }*/
+            
 
             private Pieza GetPiezaDeCasilla(int idCasilla)
             {
                 var piezas = _casillas.AsEnumerable().Where(x => x.PiezaContenida != null).ToArray();
-                return piezas.Any() ? piezas.ElementAt(0).PiezaContenida : null;
+                return piezas.Any() ? piezas[0].PiezaContenida : null;
                 //SI una casilla tiene mas de 1 ficha, hay un ERROR
             }
             private Pieza GetPiezaDeCasilla(int fila, int columna)
@@ -133,111 +98,37 @@ namespace Ajedrez.GameObjects
             {
                 return _casillas.Find(casilla => casilla.Id == id);
             }
-            /*
-            private Casilla ObtenerCasilla(int idCasilla)
-            {
-                var casilla = _casillas.AsEnumerable().Where(x => x.ID.Equals(idCasilla)).ToArray();
-                if (!casilla.Any())
-                    return null;
 
-                return casilla[0];
+            /* Esto debe ser int Queremos separar Grafico/logico, que los strings esten en el "program", el retorno  solo sera un "codigo"
+             * para que "game" sepa que escribir"
+             */
+            public ErrorCode MoverPieza(int idCasillaOrigen, int idCasillaDestuno)
+            {
+                return ErrorCode.NoError;
             }
 
-            public string MoverFicha(int idCasillaActual, int idCasillaAMover)
+            public ErrorCode MoverPieza(int filaOrigen, int columnaOrigen, int destinoFila, int destinoColumna)
             {
-                var fichaActual = ObtenerFichaDeCasilla(idCasillaActual);
-                if (fichaActual == null)
-                    return "Esta tratando de mover una ficha que no existe";
-
-                if (!PermiteMover(idCasillaAMover, fichaActual))
-                    return "Movimiento NO permitido";
-
-                var fichaEnCasilla = ObtenerFichaDeCasilla(idCasillaAMover);
-                if (fichaEnCasilla != null)
-                    fichaEnCasilla.CasillaActual = null;
-
-                var newCasilla = ObtenerCasilla(idCasillaAMover);
-                fichaActual.CasillaActual = newCasilla;
-
-                ActualizarDeadLockFicha(fichaActual);
-
-                return "Movimiento Correcto";
+                return ErrorCode.NoError;
             }
-
-            private string ObtenerNombreCasilla(int Id)
+          public bool DeadLock()
             {
-                var id = Id.ToString();
-                if (id.Length == 1)
-                    id = "0" + id;
-                return id;
-                //return "C" + id;
-            }
-
-            private string ObtenerNombreFicha(Ficha ficha)
-            {
-                var id = ficha.ID.ToString();
-                if (id.Length == 1)
-                    id = "0" + id;
-
-                var nombre = (ficha.Color == ColorFicha.Negro) ? "N" : "B";
-
-                return id;
-                //return nombre + id;
-            }
-
-            public void DibujarTableroConsola()
-            {
-                var tempFila = 1;
-                var tempColumna = 1;
-
-                var delimitadorFila = "";
-                for (int i = 0; i < (MaxColumnas * 4); i++)
-                {
-                    delimitadorFila += "-";
-                }
-
-                foreach (var casilla in _casillas)
-                {
-                    var ficha = ObtenerFichaDeCasilla(casilla.ID);
-
-                    var datoImprimir = "";
-                    var IDImprimir = ObtenerNombreCasilla(casilla.ID);
-
-                    if (ficha == null)
-                        datoImprimir = "C" + IDImprimir;
-                    else
-                        datoImprimir = ((ficha.Color == ColorFicha.Negro) ? "N" : "B") + IDImprimir;
-
-                    Console.Write("{0}|", datoImprimir);
-
-                    if (casilla.Columna == MaxColumnas)
-                    {
-                        Console.WriteLine("");
-                        Console.WriteLine(delimitadorFila);
-                    }
-                }
-            }
-
-            private void ActualizarDeadLockFicha(Ficha ficha)
-            {
-                if (ficha.Color == ColorFicha.Negro && ficha.CasillaActual.Fila == MaxFilas)
-                    ficha.DeadLock = true;
-
-                if (ficha.Color == ColorFicha.Blanco && ficha.CasillaActual.Fila == 1)
-                    ficha.DeadLock = true;
-            }
-
-            public bool DeadLock()
-            {
-                var fichas = _fichas.AsEnumerable().Where(x => x.DeadLock).ToArray();
-
-                if (!fichas.Any())
-                    return false;
-
-                if (fichas.Count() == MaxFichas)
-                    return true;
-
+             //Verificar cada pieza para ver si esta locked.
                 return false;
-            }*/
+            }
+
+            public List<Casilla> MovementPosibilitiesList(Casilla casilla)
+            {
+                throw new NotImplementedException();
+                //Aqui es donde ingresamos la casilla seleccionada para ver que opciones de movimiento tenemos, si no hay opciones retorna
+                //null y asi sabemos que esta pieza no se puede mover en este momento. aqui entran en juego los algoritmos de pathing.
+                //ejemplo peon solo puede mover 1 cuadrado excepto si esta en su posicion inicial, is hay piezas en diagonal a el, puede mover
+                //y comer. Como las piezas se accesaran desde su casilla, simplemente quitar la pieza de la casilla deberia tomalra como borrada
+            }
+            private bool DeadLick(Pieza pieza)
+            {
+                //ver cuantas opciones retorna 
+                return false;
+            }
         }
     }

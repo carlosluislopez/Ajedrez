@@ -1,7 +1,8 @@
 ﻿namespace Ajedrez.GameObjects
 {
-    enum ColorCasilla {Blanco,Negro}
-    class Casilla
+    public enum ColorCasilla {Blanco,Negro}
+
+    public class Casilla
     {
         public int Id { set; get; }
         public ColorCasilla Color { set; get; }
