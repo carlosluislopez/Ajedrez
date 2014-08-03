@@ -1,10 +1,6 @@
 ﻿using System;
-using System.CodeDom;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ajedrez.GameObjects
 {
@@ -237,7 +233,7 @@ namespace Ajedrez.GameObjects
                 return returnList;
             }
 
-            public Output MovePieceTo(Casilla casillaOrigen,Casilla casillaDestino)
+            public Output MovePiece(Casilla casillaOrigen,Casilla casillaDestino)
             {
                 var piezaOrigen = casillaOrigen.PiezaContenida;
                 var piezaDesino = casillaDestino.PiezaContenida;
@@ -252,14 +248,14 @@ namespace Ajedrez.GameObjects
                 }
                 if (CheckCheck(piezaOrigen.Color == ColorFicha.Blanco ? ColorFicha.Negro : ColorFicha.Blanco))
                 {
-                    nextTurn();
+                    NextTurn();
                     return Output.Check;
                 }
-                nextTurn();
+                NextTurn();
                     return Output.Success;
             }
 
-            private void nextTurn()
+            private void NextTurn()
             {
                 CurrentTurn = CurrentTurn == ColorJugador.Blanco ? ColorJugador.Negro : ColorJugador.Blanco;
             }
@@ -311,11 +307,11 @@ namespace Ajedrez.GameObjects
                         throw new ArgumentOutOfRangeException();
                 }
                 returnValue.AddRange(RangeCheck(casilla,casilla,direccion,range));
-                returnValue.AddRange(PeonEnemyCheck(casilla));
+                returnValue.AddRange(PeonCaptureCheck(casilla));
                 return returnValue;
             }
 
-            private IEnumerable<Casilla> PeonEnemyCheck(Casilla casilla)
+            private IEnumerable<Casilla> PeonCaptureCheck(Casilla casilla)
             {
                 var returnList = new List<Casilla>();
                 if (casilla.PiezaContenida.Color == ColorFicha.Blanco)
