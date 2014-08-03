@@ -45,5 +45,7 @@ namespace UniteTest
                 Assert.IsTrue(casilla.Columna == 1 || casilla.Columna == 3);
             }
         }
+
+
     }
 }

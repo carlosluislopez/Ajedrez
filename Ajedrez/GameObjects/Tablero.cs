@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 namespace Ajedrez.GameObjects
 {
     using PieceInit = Tuple<int, int, ColorFicha, TipoPieza>;
-    public enum ErrorCode
+    public enum Output
     {
-        NoError,OutOfBounds,InvalidMove,CancelledMove
+        Success,Check,OutOfBounds,InvalidMove,SelfCheck,CancelledMove
     }
 
     enum Direccion
@@ -23,7 +23,7 @@ namespace Ajedrez.GameObjects
         Peon,Torre,Caballero,Alfil,Reina,Rey
     }
 
-    enum ColorJugador
+    public enum ColorJugador
     {
         Blanco,Negro
     }
@@ -58,7 +58,7 @@ namespace Ajedrez.GameObjects
             {
                 _piezas = new List<Pieza>(MaxFichas);
                 _casillas = new List<Casilla>(MaxCasillas);
-
+                CurrentTurn = ColorJugador.Blanco;                
                 InicializarPosiciones();
                 CrearCasillas();
                 LlenarCasillas();
@@ -151,13 +151,13 @@ namespace Ajedrez.GameObjects
             {
                 return GetPiezaDeCasilla(GetCasilla(fila,columna).Id);
             }
-            public ErrorCode MoverPieza(int idCasillaOrigen, int idCasillaDestuno)
+            public Output MoverPieza(int idCasillaOrigen, int idCasillaDestuno)
             {
-                return ErrorCode.NoError; //TODO
+                return Output.Success; //TODO
             }
-            public ErrorCode MoverPieza(int filaOrigen, int columnaOrigen, int destinoFila, int destinoColumna)
+            public Output MoverPieza(int filaOrigen, int columnaOrigen, int destinoFila, int destinoColumna)
             {
-                return ErrorCode.NoError;//TODO
+                return Output.Success;//TODO
             }
           public bool DeadLock()
             {
@@ -237,15 +237,34 @@ namespace Ajedrez.GameObjects
                 return returnList;
             }
 
-            public ErrorCode MovePieceTo(Casilla casillaOrigen,Casilla casillaDestino)
+            public Output MovePieceTo(Casilla casillaOrigen,Casilla casillaDestino)
             {
-                var PiezaOrigen = casillaOrigen.PiezaContenida;
-                var PiezaDesino = casillaDestino.PiezaContenida;
-
+                var piezaOrigen = casillaOrigen.PiezaContenida;
+                var piezaDesino = casillaDestino.PiezaContenida;
                     casillaDestino.PiezaContenida = casillaOrigen.PiezaContenida;
                     casillaOrigen.PiezaContenida = null;
-                    return ErrorCode.NoError;
+
+                if (CheckCheck(piezaOrigen.Color))
+                {
+                    casillaOrigen.PiezaContenida = piezaOrigen;
+                    casillaDestino.PiezaContenida = piezaDesino;
+                    return Output.SelfCheck;
+                }
+                if (CheckCheck(piezaOrigen.Color == ColorFicha.Blanco ? ColorFicha.Negro : ColorFicha.Blanco))
+                {
+                    nextTurn();
+                    return Output.Check;
+                }
+                nextTurn();
+                    return Output.Success;
             }
+
+            private void nextTurn()
+            {
+                CurrentTurn = CurrentTurn == ColorJugador.Blanco ? ColorJugador.Negro : ColorJugador.Blanco;
+            }
+
+            public ColorJugador CurrentTurn { get; set; }
 
             public bool CheckCheck(ColorFicha color)
             {
