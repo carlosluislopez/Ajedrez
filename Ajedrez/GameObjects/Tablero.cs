@@ -125,7 +125,6 @@ namespace Ajedrez.GameObjects
                         tempColor = tempColor == ColorCasilla.Negro ? ColorCasilla.Blanco : ColorCasilla.Negro;
                     }
                 }
-
             }
             public Casilla GetCasilla(int fila, int columna)
             {
@@ -216,6 +215,13 @@ namespace Ajedrez.GameObjects
                 return returnList;
             }
 
+            public Output checkMate()
+            {
+                // Revisar todos los movimientos posibles de las piezas del color que esta en jaque
+                // Si no existe ningun movimiento legal, declarar jaque mate (que no regrese selfcheck mover)
+                // Tambien revisar cada turno cuando ya no hayan movimientos legales que un jugador pueda hacer,
+                //pero no esta en Jaque en el momemnto declarar StaleMate
+            }
             private IEnumerable<Casilla> CaballeroRangeCheck(Casilla casilla)
             {
                 var returnList = new List<Casilla>();
