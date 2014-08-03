@@ -133,7 +133,7 @@ namespace Ajedrez.GameObjects
             public List<Casilla> MovementPosibilitiesList(Casilla casilla)
             {
                 var piezaEnCasilla = casilla.PiezaContenida;
-                return piezaEnCasilla == null ? new List<Casilla>() : MovimientoPieza(casilla);
+                return piezaEnCasilla == null ? null : MovimientoPieza(casilla);
                 //Retorna null si no hay pizas en la casilla, retorna vacio si la pieza no tienen movimientos disponibles, o retorna los movimientos 
                 //disponibles cuando los hay
                 //Aqui es donde ingresamos la casilla seleccionada para ver que opciones de movimiento tenemos, si no hay opciones retorna
@@ -183,8 +183,6 @@ namespace Ajedrez.GameObjects
                         returnList.AddRange(RangeCheck(casilla, casilla, Direccion.Left,1));
                         returnList.AddRange(RangeCheck(casilla, casilla, Direccion.LeftUp,1));
                         break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
                 }
                 return returnList;
             }
