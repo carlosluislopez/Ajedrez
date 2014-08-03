@@ -231,9 +231,11 @@ namespace Ajedrez.GameObjects
                     if(i==0) continue;
                     var j = (i == 2|| i ==-2) ? 1 : 2;
                     returnList.AddRange(_casillas.Where(casilla1 => casilla1.Fila == casilla.Fila + i
-                        && casilla1.Columna == casilla.Columna + j));
+                        && casilla1.Columna == casilla.Columna + j
+                        && (casilla1.PiezaContenida == null || casilla1.PiezaContenida.Color != casilla.PiezaContenida.Color)));
                     returnList.AddRange(_casillas.Where(casilla1 => casilla1.Fila == casilla.Fila + i
-                        && casilla1.Columna == casilla.Columna - j));
+                        && casilla1.Columna == casilla.Columna - j
+                        && (casilla1.PiezaContenida == null || casilla1.PiezaContenida.Color != casilla.PiezaContenida.Color)));
                 }
                 return returnList;
             }

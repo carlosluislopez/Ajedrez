@@ -30,7 +30,20 @@ namespace UniteTest
                 Assert.IsTrue(casilla.Columna == 3);
                 Assert.IsTrue(casilla.Fila == 3||casilla.Fila == 4);
             }
-            
+        }
+        [Test]
+        public void KnightTest()
+        {
+            Print.WriteLine("Test de Seleccion del Caballero en B1");
+            var board = new Tablero();
+            var fila = 1;
+            var columna = 2;
+            List<Casilla> movesPossible = board.SelectPiece(fila, columna);
+            foreach (var casilla in movesPossible)
+            {
+                Assert.IsTrue(casilla.Fila == 3);
+                Assert.IsTrue(casilla.Columna == 1 || casilla.Columna == 3);
+            }
         }
     }
 }
