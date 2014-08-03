@@ -99,13 +99,14 @@ namespace Ajedrez.GameObjects
             }
 
             private  Pieza CrearPieza(TipoPieza tipo,ColorFicha color)
-            {   
-                return new Pieza
+            {   var newPiece =  new Pieza
                 {
                     Color = color,
                     Id = _piezaContador++,
                     Tipo = (int)tipo
                 };
+                _piezas.Add(newPiece);
+                return newPiece;
             }
 
             private void CrearCasillas()
@@ -168,16 +169,11 @@ namespace Ajedrez.GameObjects
             {
                 var piezaEnCasilla = casilla.PiezaContenida;
                 return piezaEnCasilla == null ? null : MovimientoPieza(casilla);
-                //Retorna null si no hay pizas en la casilla, retorna vacio si la pieza no tienen movimientos disponibles, o retorna los movimientos 
-                //disponibles cuando los hay
-                //Aqui es donde ingresamos la casilla seleccionada para ver que opciones de movimiento tenemos, si no hay opciones retorna
-                //null y asi sabemos que esta pieza no se puede mover en este momento. aqui entran en juego los algoritmos de pathing.
-                //ejemplo peon solo puede mover 1 cuadrado excepto si esta en su posicion inicial, is hay piezas en diagonal a el, puede mover
-                //y comer. Como las piezas se accesaran desde su casilla, simplemente quitar la pieza de la casilla deberia tomalra como borrada
             }
 
             private List<Casilla> MovimientoPieza(Casilla casilla)
             {
+                var king = GetKing(casilla.PiezaContenida.Color);
                 var returnList = new List<Casilla>();
                 switch ((TipoPieza)casilla.PiezaContenida.Tipo)
                 {
@@ -218,6 +214,7 @@ namespace Ajedrez.GameObjects
                         returnList.AddRange(RangeCheck(casilla, casilla, Direccion.LeftDown,1));
                         returnList.AddRange(RangeCheck(casilla, casilla, Direccion.Left,1));
                         returnList.AddRange(RangeCheck(casilla, casilla, Direccion.LeftUp,1));
+                        returnList.RemoveAll(casilla1 => CasillasEnPeligro(casilla).Contains(casilla1));
                         break;
                 }
                 return returnList;
@@ -238,6 +235,42 @@ namespace Ajedrez.GameObjects
                         && (casilla1.PiezaContenida == null || casilla1.PiezaContenida.Color != casilla.PiezaContenida.Color)));
                 }
                 return returnList;
+            }
+
+            public ErrorCode MovePieceTo(Casilla casillaOrigen,Casilla casillaDestino)
+            {
+                var PiezaOrigen = casillaOrigen.PiezaContenida;
+                var PiezaDesino = casillaDestino.PiezaContenida;
+
+                    casillaDestino.PiezaContenida = casillaOrigen.PiezaContenida;
+                    casillaOrigen.PiezaContenida = null;
+                    return ErrorCode.NoError;
+            }
+
+            public bool CheckCheck(ColorFicha color)
+            {
+                var king = GetKing(color);
+                var enPeligro = CasillasEnPeligro(king);
+                var isKingChecked = enPeligro.Contains(king);
+                return isKingChecked;
+            }
+
+            private Casilla GetKing(ColorFicha color)
+            {      
+                return _casillas.FirstOrDefault(casilla => casilla.PiezaContenida.Tipo == (int) TipoPieza.Rey
+                                                        && casilla.PiezaContenida.Color == color);
+            }
+
+            private List<Casilla> CasillasEnPeligro(Casilla king)
+            {
+                var colorContrario = king.PiezaContenida.Color == ColorFicha.Blanco ? ColorFicha.Negro : ColorFicha.Blanco;
+                var enemyPieces = _casillas.FindAll(casilla => casilla.PiezaContenida.Color == colorContrario);
+                var casillasEnPeligro = new List<Casilla>();
+                foreach (var enemyPiece in enemyPieces)
+                {
+                    casillasEnPeligro.AddRange(MovementPosibilitiesList(enemyPiece));
+                }
+                return casillasEnPeligro;
             }
 
             private IEnumerable<Casilla> PeonRangeCheck(Casilla casilla)
