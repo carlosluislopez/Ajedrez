@@ -1,13 +1,14 @@
 ﻿using System;
 using System.CodeDom;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Ajedrez.GameObjects
 {
-
+    using PieceInit = Tuple<int, int, ColorFicha, TipoPieza>;
     public enum ErrorCode
     {
         NoError,OutOfBounds,InvalidMove,CancelledMove
@@ -21,51 +22,90 @@ namespace Ajedrez.GameObjects
     {
         Peon,Torre,Caballero,Alfil,Reina,Rey
     }
+
+    enum ColorJugador
+    {
+        Blanco,Negro
+    }
         public class Tablero
         {
+            private List<PieceInit> _initialValueSets =
+                new List<PieceInit>();
+            
             private readonly Dictionary<int, string> _columnaLetraDictionary = new Dictionary<int, string>
             {
                 {1,"A"},{2,"B"},{3,"C"},{4,"D"},{5,"E"},{6,"F"},{7,"G"},{8,"H"}
             };
+
             private readonly Dictionary<int, string> _piezasDictionary = new Dictionary<int, string>
             {
                 {0, "Peon"},{1, "Torre"},{2, "Caballero"},{3, "Alfil"},{4, "Reina"},{5, "Rey"}
             };
             public Dictionary<int, string> ColumnaLetraDictionary{get { return _columnaLetraDictionary; }}
             public Dictionary<int, string> PiezasDictionary{get { return _piezasDictionary; }}
+            
             private const int MaxCasillas = 64;
             private const int MaxFichas = 24;
             private const int MaxFilas = 8;
             private const int MaxColumnas = 8;
-            private int PiezaContador = 0;
+            private int _piezaContador;
 
             
             private List<Pieza> _piezas;
             private List<Casilla> _casillas;
 
             public Tablero()
-            { 
+            {
                 _piezas = new List<Pieza>(MaxFichas);
                 _casillas = new List<Casilla>(MaxCasillas);
 
+                InicializarPosiciones();
                 CrearCasillas();
                 LlenarCasillas();
-               //
+            }
+
+            private void InicializarPosiciones()
+            {
+                for (var i = 1; i <= 8; i++)
+                    _initialValueSets.Add(new PieceInit(2, i, ColorFicha.Blanco, TipoPieza.Peon));
+                for (var i = 1; i <= 8; i++)
+                    _initialValueSets.Add(new PieceInit(7, i, ColorFicha.Negro, TipoPieza.Peon));
+                _initialValueSets.Add(new PieceInit(1,1,ColorFicha.Blanco,TipoPieza.Torre));
+                _initialValueSets.Add(new PieceInit(1,8,ColorFicha.Blanco,TipoPieza.Torre));
+                _initialValueSets.Add(new PieceInit(1,2,ColorFicha.Blanco,TipoPieza.Caballero));
+                _initialValueSets.Add(new PieceInit(1,7,ColorFicha.Blanco,TipoPieza.Caballero));
+                _initialValueSets.Add(new PieceInit(1,3,ColorFicha.Blanco,TipoPieza.Alfil));
+                _initialValueSets.Add(new PieceInit(1,7,ColorFicha.Blanco,TipoPieza.Alfil));
+                _initialValueSets.Add(new PieceInit(1,4,ColorFicha.Blanco,TipoPieza.Reina));
+                _initialValueSets.Add(new PieceInit(1,5,ColorFicha.Blanco,TipoPieza.Rey));
+
+                _initialValueSets.Add(new PieceInit(8, 1, ColorFicha.Blanco, TipoPieza.Torre));
+                _initialValueSets.Add(new PieceInit(8, 2, ColorFicha.Blanco, TipoPieza.Caballero));
+                _initialValueSets.Add(new PieceInit(8, 3, ColorFicha.Blanco, TipoPieza.Alfil));
+                _initialValueSets.Add(new PieceInit(8, 4, ColorFicha.Blanco, TipoPieza.Reina));
+                _initialValueSets.Add(new PieceInit(8, 5, ColorFicha.Blanco, TipoPieza.Rey));
+                _initialValueSets.Add(new PieceInit(8, 6, ColorFicha.Blanco, TipoPieza.Alfil));
+                _initialValueSets.Add(new PieceInit(8, 7, ColorFicha.Blanco, TipoPieza.Caballero));
+                _initialValueSets.Add(new PieceInit(8, 8, ColorFicha.Blanco, TipoPieza.Torre));
             }
 
             private void LlenarCasillas()
             {
-                foreach (var casilla in _casillas)
+                foreach (var initValSet in _initialValueSets)
                 {
-                    InitialPosition(casilla);
+                    GetCasilla(initValSet.Item1, initValSet.Item2).PiezaContenida = 
+                        CrearPieza(initValSet.Item4,initValSet.Item3);
                 }
             }
 
-            private void InitialPosition(Casilla casilla)
-            {
-                //Colocar la pieza correcta en la casilla.
-                //El contador de piezas provee el ID
-                throw new NotImplementedException();
+            private  Pieza CrearPieza(TipoPieza tipo,ColorFicha color)
+            {   
+                return new Pieza
+                {
+                    Color = color,
+                    Id = _piezaContador++,
+                    Tipo = (int)tipo
+                };
             }
 
             private void CrearCasillas()
@@ -90,43 +130,37 @@ namespace Ajedrez.GameObjects
                 }
 
             }
-            
+            public Casilla GetCasilla(int fila, int columna)
+            {
+                var casillas = _casillas.AsEnumerable().Where(casilla => casilla.Columna == columna && casilla.Fila == fila).ToArray();
+                return casillas.Any() ? casillas[0] : null;
+            }
+            public Casilla GetCasilla(int id)
+            {
+                return _casillas.Find(casilla => casilla.Id == id);
+            }
 
             private Pieza GetPiezaDeCasilla(int idCasilla)
             {
-                var piezas = _casillas.AsEnumerable().Where(x => x.PiezaContenida != null).ToArray();
-                return piezas.Any() ? piezas[0].PiezaContenida : null;
+                var pieza = _casillas.First(casilla => casilla.PiezaContenida != null && casilla.Id == idCasilla).PiezaContenida;
+                return pieza;
                 //SI una casilla tiene mas de 1 ficha, hay un ERROR
             }
             private Pieza GetPiezaDeCasilla(int fila, int columna)
             {
                 return GetPiezaDeCasilla(GetCasilla(fila,columna).Id);
             }
-            private Casilla GetCasilla(int fila, int columna)
-            {
-                var casillas = _casillas.AsEnumerable().Where(casilla => casilla.Columna == fila && casilla.Fila == columna).ToArray();
-                return casillas.Any() ? casillas[0]: null;
-            }
-            private Casilla GetCasilla(int id)
-            {
-                return _casillas.Find(casilla => casilla.Id == id);
-            }
-
-            /* Esto debe ser int Queremos separar Grafico/logico, que los strings esten en el "program", el retorno  solo sera un "codigo"
-             * para que "game" sepa que escribir"
-             */
             public ErrorCode MoverPieza(int idCasillaOrigen, int idCasillaDestuno)
             {
-                return ErrorCode.NoError;
+                return ErrorCode.NoError; //TODO
             }
-
             public ErrorCode MoverPieza(int filaOrigen, int columnaOrigen, int destinoFila, int destinoColumna)
             {
-                return ErrorCode.NoError;
+                return ErrorCode.NoError;//TODO
             }
           public bool DeadLock()
             {
-             //Verificar cada pieza para ver si esta locked.
+             //Verificar cada pieza para ver si esta locked. //TODO
                 return false;
             }
 
@@ -192,18 +226,15 @@ namespace Ajedrez.GameObjects
             private IEnumerable<Casilla> CaballeroRangeCheck(Casilla casilla)
             {
                 var returnList = new List<Casilla>();
-                for (int i = 2; i >= -2; i--)
+                for (var i = 2; i >= -2; i--)
                 {
                     if(i==0) continue;
                     var j = (i == 2|| i ==-2) ? 1 : 2;
-                    returnList.AddRange(_casillas.Where(casilla1 => casilla1.Fila == casilla1.Fila + i
-                        && casilla1.Columna == casilla1.Columna + j));
-                    returnList.AddRange(_casillas.Where(casilla1 => casilla1.Fila == casilla1.Fila + i
-                        && casilla1.Columna == casilla1.Columna - j));
+                    returnList.AddRange(_casillas.Where(casilla1 => casilla1.Fila == casilla.Fila + i
+                        && casilla1.Columna == casilla.Columna + j));
+                    returnList.AddRange(_casillas.Where(casilla1 => casilla1.Fila == casilla.Fila + i
+                        && casilla1.Columna == casilla.Columna - j));
                 }
-                
-                
-                
                 return returnList;
             }
 
@@ -228,7 +259,6 @@ namespace Ajedrez.GameObjects
                 returnValue.AddRange(RangeCheck(casilla,casilla,direccion,range));
                 returnValue.AddRange(PeonEnemyCheck(casilla));
                 return returnValue;
-
             }
 
             private IEnumerable<Casilla> PeonEnemyCheck(Casilla casilla)
@@ -250,8 +280,6 @@ namespace Ajedrez.GameObjects
                 }
                 return returnList;
             }
-
-
             private IEnumerable<Casilla> RangeCheck(Casilla casillaOrigen,Casilla nextCasilla, Direccion direccion,int maximumRange = 9)
             {
                 var returnList = new List<Casilla>();
@@ -260,7 +288,7 @@ namespace Ajedrez.GameObjects
                 if (nextCasilla == null) return returnList;
                 returnList.Add(nextCasilla);
                 maximumRange--;
-                if(nextCasilla.PiezaContenida != null)
+                if(nextCasilla.PiezaContenida == null)
                     returnList.AddRange(RangeCheck(casillaOrigen,nextCasilla,direccion,maximumRange));
                 return returnList;
             }
@@ -270,17 +298,17 @@ namespace Ajedrez.GameObjects
                 var filaOffset = FilaOffset(direccion);
                 var columnaOffset = ColumnaOffset(direccion);
 
-                return _casillas.First(casilla1 => casilla1.Fila == nextCasilla.Fila + filaOffset 
+                return _casillas.FirstOrDefault(casilla1 => casilla1.Fila == nextCasilla.Fila + filaOffset 
                     && casilla1.Columna == nextCasilla.Columna + columnaOffset
                     && (casilla1.PiezaContenida == null 
-                        || casilla1.PiezaContenida.Color != casillaOrigen.PiezaContenida.Color
+                        || (casilla1.PiezaContenida.Color != casillaOrigen.PiezaContenida.Color
                         && (TipoPieza)casillaOrigen.PiezaContenida.Tipo != TipoPieza.Peon)
-                        );
+                        ));
             }
 
             private static int FilaOffset(Direccion direccion)
             {
-                int filaOffset = 0;
+                var filaOffset = 0;
                 switch (direccion)
                 {
                     case Direccion.LeftUp:
@@ -299,17 +327,17 @@ namespace Ajedrez.GameObjects
 
             private static int ColumnaOffset(Direccion direccion)
             {
-                int columnaOffset = 0;
+                var columnaOffset = 0;
                 switch (direccion)
                 {
-                    case Direccion.Left:
-                    case Direccion.LeftUp:
                     case Direccion.LeftDown:
+                    case Direccion.LeftUp:
+                    case Direccion.Left:
                         columnaOffset = 1;
                         break;
-                    case Direccion.Right:
-                    case Direccion.RightDown:
                     case Direccion.RightUp:
+                    case Direccion.RightDown:
+                    case Direccion.Right:
                         columnaOffset = -1;
                         break;
                 }
@@ -321,6 +349,11 @@ namespace Ajedrez.GameObjects
             {
                 //ver cuantas opciones retorna 
                 return false;
+            }
+
+            public List<Casilla> SelectPiece(int fila,int columna)
+            {
+                return MovementPosibilitiesList(GetCasilla(fila, columna));
             }
         }
     }
