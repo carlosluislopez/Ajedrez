@@ -62,10 +62,10 @@ namespace Ajedrez.GameObjects
 
             private void InicializarPosiciones()
             {
-                for (var i = 1; i <= 8; i++)
-                    _initialValueSets.Add(new PieceInit(2, i, ColorFicha.Blanco, TipoPieza.Peon));
-                for (var i = 1; i <= 8; i++)
-                    _initialValueSets.Add(new PieceInit(7, i, ColorFicha.Negro, TipoPieza.Peon));
+                for (var columna = 1; columna <= MaxColumnas; columna++)
+                    _initialValueSets.Add(new PieceInit(2, columna, ColorFicha.Blanco, TipoPieza.Peon));
+                for (var columna = 1; columna <= MaxColumnas; columna++)
+                    _initialValueSets.Add(new PieceInit(7, columna, ColorFicha.Negro, TipoPieza.Peon));
                 _initialValueSets.Add(new PieceInit(1,1,ColorFicha.Blanco,TipoPieza.Torre));
                 _initialValueSets.Add(new PieceInit(1,8,ColorFicha.Blanco,TipoPieza.Torre));
                 _initialValueSets.Add(new PieceInit(1,2,ColorFicha.Blanco,TipoPieza.Caballero));
@@ -75,14 +75,14 @@ namespace Ajedrez.GameObjects
                 _initialValueSets.Add(new PieceInit(1,4,ColorFicha.Blanco,TipoPieza.Reina));
                 _initialValueSets.Add(new PieceInit(1,5,ColorFicha.Blanco,TipoPieza.Rey));
 
-                _initialValueSets.Add(new PieceInit(8, 1, ColorFicha.Blanco, TipoPieza.Torre));
-                _initialValueSets.Add(new PieceInit(8, 2, ColorFicha.Blanco, TipoPieza.Caballero));
-                _initialValueSets.Add(new PieceInit(8, 3, ColorFicha.Blanco, TipoPieza.Alfil));
-                _initialValueSets.Add(new PieceInit(8, 4, ColorFicha.Blanco, TipoPieza.Reina));
-                _initialValueSets.Add(new PieceInit(8, 5, ColorFicha.Blanco, TipoPieza.Rey));
-                _initialValueSets.Add(new PieceInit(8, 6, ColorFicha.Blanco, TipoPieza.Alfil));
-                _initialValueSets.Add(new PieceInit(8, 7, ColorFicha.Blanco, TipoPieza.Caballero));
-                _initialValueSets.Add(new PieceInit(8, 8, ColorFicha.Blanco, TipoPieza.Torre));
+                _initialValueSets.Add(new PieceInit(8, 1, ColorFicha.Negro, TipoPieza.Torre));
+                _initialValueSets.Add(new PieceInit(8, 2, ColorFicha.Negro, TipoPieza.Caballero));
+                _initialValueSets.Add(new PieceInit(8, 3, ColorFicha.Negro, TipoPieza.Alfil));
+                _initialValueSets.Add(new PieceInit(8, 4, ColorFicha.Negro, TipoPieza.Reina));
+                _initialValueSets.Add(new PieceInit(8, 5, ColorFicha.Negro, TipoPieza.Rey));
+                _initialValueSets.Add(new PieceInit(8, 6, ColorFicha.Negro, TipoPieza.Alfil));
+                _initialValueSets.Add(new PieceInit(8, 7, ColorFicha.Negro, TipoPieza.Caballero));
+                _initialValueSets.Add(new PieceInit(8, 8, ColorFicha.Negro, TipoPieza.Torre));
             }
 
             private void LlenarCasillas()

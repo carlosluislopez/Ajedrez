@@ -6,3 +6,6 @@ C:\Users\Moriya Shrine\Desktop\AyDdS\Ajedrez\Ajedrez\UniteTest\obj\Debug\UniteTe
 C:\Users\Moriya Shrine\Desktop\AyDdS\Ajedrez\Ajedrez\UniteTest\bin\Debug\Ajedrez.exe
 C:\Users\Moriya Shrine\Desktop\AyDdS\Ajedrez\Ajedrez\UniteTest\bin\Debug\Ajedrez.pdb
 C:\Users\Moriya Shrine\Desktop\AyDdS\Ajedrez\Ajedrez\UniteTest\obj\Debug\UniteTest.csprojResolveAssemblyReference.cache
+C:\Users\AngelaJDM\Desktop\Ajedrez1\Ajedrez\UniteTest\bin\Debug\UniteTest.exe.config
+C:\Users\AngelaJDM\Desktop\Ajedrez1\Ajedrez\UniteTest\obj\Debug\UniteTest.exe
+C:\Users\AngelaJDM\Desktop\Ajedrez1\Ajedrez\UniteTest\obj\Debug\UniteTest.pdb
