@@ -148,6 +148,7 @@ namespace Ajedrez.GameObjects
                 switch ((TipoPieza)casilla.PiezaContenida.Tipo)
                 {
                     case TipoPieza.Peon:
+                        returnList.AddRange(PeonRangeCheck(casilla));
                         break;
                     case TipoPieza.Torre:
                         returnList.AddRange(RangeCheck(casilla,casilla,Direccion.Up));
@@ -156,6 +157,7 @@ namespace Ajedrez.GameObjects
                         returnList.AddRange(RangeCheck(casilla,casilla,Direccion.Right));
                         break;
                     case TipoPieza.Caballero:
+                        returnList.AddRange(CaballeroRangeCheck(casilla));
                         break;
                     case TipoPieza.Alfil:
                         returnList.AddRange(RangeCheck(casilla, casilla, Direccion.LeftUp));
@@ -187,6 +189,69 @@ namespace Ajedrez.GameObjects
                 return returnList;
             }
 
+            private IEnumerable<Casilla> CaballeroRangeCheck(Casilla casilla)
+            {
+                var returnList = new List<Casilla>();
+                for (int i = 2; i >= -2; i--)
+                {
+                    if(i==0) continue;
+                    var j = (i == 2|| i ==-2) ? 1 : 2;
+                    returnList.AddRange(_casillas.Where(casilla1 => casilla1.Fila == casilla1.Fila + i
+                        && casilla1.Columna == casilla1.Columna + j));
+                    returnList.AddRange(_casillas.Where(casilla1 => casilla1.Fila == casilla1.Fila + i
+                        && casilla1.Columna == casilla1.Columna - j));
+                }
+                
+                
+                
+                return returnList;
+            }
+
+            private IEnumerable<Casilla> PeonRangeCheck(Casilla casilla)
+            {
+                Direccion direccion;
+                int range;
+                var returnValue = new List<Casilla>();
+                switch (casilla.PiezaContenida.Color)
+                {
+                    case ColorFicha.Blanco:
+                        range = casilla.Fila == 2 ? 2 : 1;
+                        direccion = Direccion.Up;
+                        break;
+                    case ColorFicha.Negro:
+                        range = casilla.Fila == 7 ? 2 : 1;
+                        direccion = Direccion.Down;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+                returnValue.AddRange(RangeCheck(casilla,casilla,direccion,range));
+                returnValue.AddRange(PeonEnemyCheck(casilla));
+                return returnValue;
+
+            }
+
+            private IEnumerable<Casilla> PeonEnemyCheck(Casilla casilla)
+            {
+                var returnList = new List<Casilla>();
+                if (casilla.PiezaContenida.Color == ColorFicha.Blanco)
+                {
+                    var enemigoUR = GetCasilla(casilla.Fila + 1, casilla.Columna + 1);
+                    var enemigoUL = GetCasilla(casilla.Fila + 1, casilla.Columna - 1);
+                    if (enemigoUL.PiezaContenida != null) returnList.Add(enemigoUL);
+                    if (enemigoUR.PiezaContenida != null) returnList.Add(enemigoUR);
+                }
+                else
+                {
+                    var enemigoDR = GetCasilla(casilla.Fila - 1, casilla.Columna + 1);
+                    var enemigoDL = GetCasilla(casilla.Fila - 1, casilla.Columna - 1);
+                    if (enemigoDL.PiezaContenida != null) returnList.Add(enemigoDL);
+                    if (enemigoDR.PiezaContenida != null) returnList.Add(enemigoDR);
+                }
+                return returnList;
+            }
+
+
             private IEnumerable<Casilla> RangeCheck(Casilla casillaOrigen,Casilla nextCasilla, Direccion direccion,int maximumRange = 9)
             {
                 var returnList = new List<Casilla>();
@@ -207,7 +272,10 @@ namespace Ajedrez.GameObjects
 
                 return _casillas.First(casilla1 => casilla1.Fila == nextCasilla.Fila + filaOffset 
                     && casilla1.Columna == nextCasilla.Columna + columnaOffset
-                    && casilla1.PiezaContenida.Color != casillaOrigen.PiezaContenida.Color);
+                    && (casilla1.PiezaContenida == null 
+                        || casilla1.PiezaContenida.Color != casillaOrigen.PiezaContenida.Color
+                        && (TipoPieza)casillaOrigen.PiezaContenida.Tipo != TipoPieza.Peon)
+                        );
             }
 
             private static int FilaOffset(Direccion direccion)
