@@ -26,7 +26,7 @@ namespace Ajedrez.GameObjects
     }
         public class Tablero
         {
-            private List<PieceInit> _initialValueSets =
+            private readonly List<PieceInit> _initialValueSets =
                 new List<PieceInit>();
             
             private readonly Dictionary<int, string> _columnaLetraDictionary = new Dictionary<int, string>
@@ -48,13 +48,13 @@ namespace Ajedrez.GameObjects
             private int _piezaContador;
 
             
-            private List<Pieza> _piezas;
-            private List<Casilla> _casillas;
+            private readonly List<Pieza> _piezas;
+            private readonly List<Casilla> _casillas;
 
             public Tablero()
             {
-                _piezas = new List<Pieza>(MaxFichas);
-                _casillas = new List<Casilla>(MaxCasillas);
+                _piezas = new List<Pieza>();
+                _casillas = new List<Casilla>();
                 CurrentTurn = ColorJugador.Blanco;      
           
                 InicializarPosiciones();
@@ -68,14 +68,14 @@ namespace Ajedrez.GameObjects
                     _initialValueSets.Add(new PieceInit(2, columna, ColorFicha.Blanco, TipoPieza.Peon));
                 for (var columna = 1; columna <= MaxColumnas; columna++)
                     _initialValueSets.Add(new PieceInit(7, columna, ColorFicha.Negro, TipoPieza.Peon));
-                _initialValueSets.Add(new PieceInit(1,1,ColorFicha.Blanco,TipoPieza.Torre));
-                _initialValueSets.Add(new PieceInit(1,8,ColorFicha.Blanco,TipoPieza.Torre));
-                _initialValueSets.Add(new PieceInit(1,2,ColorFicha.Blanco,TipoPieza.Caballero));
-                _initialValueSets.Add(new PieceInit(1,7,ColorFicha.Blanco,TipoPieza.Caballero));
-                _initialValueSets.Add(new PieceInit(1,3,ColorFicha.Blanco,TipoPieza.Alfil));
-                _initialValueSets.Add(new PieceInit(1,6,ColorFicha.Blanco,TipoPieza.Alfil));
-                _initialValueSets.Add(new PieceInit(1,4,ColorFicha.Blanco,TipoPieza.Reina));
-                _initialValueSets.Add(new PieceInit(1,5,ColorFicha.Blanco,TipoPieza.Rey));
+                _initialValueSets.Add(new PieceInit(1, 1, ColorFicha.Negro, TipoPieza.Torre));
+                _initialValueSets.Add(new PieceInit(1, 2, ColorFicha.Negro, TipoPieza.Caballero));
+                _initialValueSets.Add(new PieceInit(1, 3, ColorFicha.Negro, TipoPieza.Alfil));
+                _initialValueSets.Add(new PieceInit(1, 4, ColorFicha.Negro, TipoPieza.Reina));
+                _initialValueSets.Add(new PieceInit(1, 5, ColorFicha.Negro, TipoPieza.Rey));
+                _initialValueSets.Add(new PieceInit(1, 6, ColorFicha.Negro, TipoPieza.Alfil));
+                _initialValueSets.Add(new PieceInit(1, 7, ColorFicha.Negro, TipoPieza.Caballero));
+                _initialValueSets.Add(new PieceInit(1, 8, ColorFicha.Negro, TipoPieza.Torre));
 
                 _initialValueSets.Add(new PieceInit(8, 1, ColorFicha.Negro, TipoPieza.Torre));
                 _initialValueSets.Add(new PieceInit(8, 2, ColorFicha.Negro, TipoPieza.Caballero));
@@ -85,6 +85,29 @@ namespace Ajedrez.GameObjects
                 _initialValueSets.Add(new PieceInit(8, 6, ColorFicha.Negro, TipoPieza.Alfil));
                 _initialValueSets.Add(new PieceInit(8, 7, ColorFicha.Negro, TipoPieza.Caballero));
                 _initialValueSets.Add(new PieceInit(8, 8, ColorFicha.Negro, TipoPieza.Torre));
+            }
+            private void CrearCasillas()
+            {
+                var tempColor = ColorCasilla.Negro;
+
+                for (var columna = 1; columna <= MaxColumnas; columna++)
+                {
+                    for (var fila = 1; fila <= MaxFilas; fila++)
+                    {
+                        _casillas.Add(NewCasilla(tempColor, columna, fila));
+                        tempColor = tempColor == ColorCasilla.Negro ? ColorCasilla.Blanco : ColorCasilla.Negro;
+                    }
+                }
+            }
+
+            private Casilla NewCasilla(ColorCasilla color, int columna, int fila)
+            {
+                return new Casilla
+                {
+                    Color = color,
+                    Columna = columna,
+                    Fila = fila
+                };
             }
 
             private void LlenarCasillas()
@@ -107,27 +130,7 @@ namespace Ajedrez.GameObjects
                 return newPiece;
             }
 
-            private void CrearCasillas()
-            {
-                var tempColor = ColorCasilla.Negro;
-
-                for (var columna = 1; columna <= MaxColumnas; columna++)
-                {
-                    for (var fila = 1; fila <= MaxFilas; fila++)
-                    {
-                        _casillas.Add
-                            (
-                            new Casilla
-                                {
-                                    Color = tempColor,
-                                    Columna = columna,
-                                    Fila = fila
-                                }
-                            );
-                        tempColor = tempColor == ColorCasilla.Negro ? ColorCasilla.Blanco : ColorCasilla.Negro;
-                    }
-                }
-            }
+            
             public Casilla GetCasilla(int fila, int columna)
             {
                 var casillas = _casillas.AsEnumerable().Where(casilla => casilla.Columna == columna && casilla.Fila == fila).ToArray();
@@ -147,19 +150,6 @@ namespace Ajedrez.GameObjects
             private Pieza GetPiezaDeCasilla(int fila, int columna)
             {
                 return GetPiezaDeCasilla(GetCasilla(fila,columna).Id);
-            }
-            public Output MoverPieza(int idCasillaOrigen, int idCasillaDestuno)
-            {
-                return Output.Success; //TODO
-            }
-            public Output MoverPieza(int filaOrigen, int columnaOrigen, int destinoFila, int destinoColumna)
-            {
-                return Output.Success;//TODO
-            }
-          public bool DeadLock()
-            {
-             //Verificar cada pieza para ver si esta locked. //TODO
-                return false;
             }
 
             public IEnumerable<Casilla> MovementPosibilitiesList(Casilla casilla)
@@ -402,13 +392,6 @@ namespace Ajedrez.GameObjects
                         break;
                 }
                 return columnaOffset;
-            }
-
-
-            private bool DeadLock(Pieza pieza)
-            {
-                //ver cuantas opciones retorna 
-                return false;
             }
 
             public IEnumerable<Casilla> SelectPiece(int fila,int columna)

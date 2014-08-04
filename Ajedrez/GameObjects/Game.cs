@@ -23,9 +23,9 @@ namespace Ajedrez.GameObjects
 
         private string ObtenerNombreCasilla(Casilla casilla)
         {
-            var fila = _diccionarioColumnas[casilla.Fila].ToString();
+            var fila = _diccionarioColumnas[casilla.Fila];
 
-            var id = fila + casilla.Columna.ToString();
+            var id = fila + casilla.Columna;
 
             var nombre = (casilla.Color == ColorCasilla.Negro) ? "N" : "B";
 
@@ -64,7 +64,7 @@ namespace Ajedrez.GameObjects
 
             var nombre = (pieza.Color == ColorFicha.Negro) ? "N" : "B";
 
-            return prefijo + nombre + "1";
+            return "▲" + prefijo + nombre;
         }
 
         public void DibujarTableroConsola()
