@@ -7,7 +7,8 @@ namespace Ajedrez.GameObjects
     using PieceInit = Tuple<int, int, ColorFicha, TipoPieza>;
     public enum Output
     {
-        Success,Check,OutOfBounds,InvalidMove,SelfCheck,CancelledMove
+        Success,Check,OutOfBounds,InvalidMove,SelfCheck,CancelledMove,
+        NotYourTurn
     }
 
     enum Direccion
@@ -221,6 +222,7 @@ namespace Ajedrez.GameObjects
                 // Si no existe ningun movimiento legal, declarar jaque mate (que no regrese selfcheck mover)
                 // Tambien revisar cada turno cuando ya no hayan movimientos legales que un jugador pueda hacer,
                 //pero no esta en Jaque en el momemnto declarar StaleMate
+                throw new NotImplementedException();
             }
             private IEnumerable<Casilla> CaballeroRangeCheck(Casilla casilla)
             {
@@ -243,6 +245,7 @@ namespace Ajedrez.GameObjects
             {
                 var piezaOrigen = casillaOrigen.PiezaContenida;
                 var piezaDesino = casillaDestino.PiezaContenida;
+                if (piezaOrigen.Color != (ColorFicha) CurrentTurn) return Output.NotYourTurn;
                     casillaDestino.PiezaContenida = casillaOrigen.PiezaContenida;
                     casillaOrigen.PiezaContenida = null;
 
