@@ -38,6 +38,7 @@ namespace UniteTest
             var board = new Tablero();
             var fila = 1;
             var columna = 2;
+            
             IEnumerable<Casilla> movesPossible = board.SelectPiece(fila, columna);
             foreach (var casilla in movesPossible)
             {

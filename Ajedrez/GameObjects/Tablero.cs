@@ -8,7 +8,9 @@ namespace Ajedrez.GameObjects
     public enum Output
     {
         Success,Check,OutOfBounds,InvalidMove,SelfCheck,CancelledMove,
-        NotYourTurn
+        NotYourTurn,
+        CheckMate,
+        StaleMate
     }
 
     enum Direccion
@@ -146,7 +148,6 @@ namespace Ajedrez.GameObjects
             {
                 var pieza = _casillas.First(casilla => casilla.PiezaContenida != null && casilla.Id == idCasilla).PiezaContenida;
                 return pieza;
-                //SI una casilla tiene mas de 1 ficha, hay un ERROR
             }
             private Pieza GetPiezaDeCasilla(int fila, int columna)
             {
@@ -208,14 +209,7 @@ namespace Ajedrez.GameObjects
                 return returnList;
             }
 
-            public Output checkMate()
-            {
-                // Revisar todos los movimientos posibles de las piezas del color que esta en jaque
-                // Si no existe ningun movimiento legal, declarar jaque mate (que no regrese selfcheck mover)
-                // Tambien revisar cada turno cuando ya no hayan movimientos legales que un jugador pueda hacer,
-                //pero no esta en Jaque en el momemnto declarar StaleMate
-                throw new NotImplementedException();
-            }
+
             private IEnumerable<Casilla> CaballeroRangeCheck(Casilla casilla)
             {
                 var returnList = new List<Casilla>();
@@ -233,29 +227,44 @@ namespace Ajedrez.GameObjects
                 return returnList;
             }
 
-            public Output MovePiece(Casilla casillaOrigen,Casilla casillaDestino)
+            public Output MovePiece(Casilla casillaOrigen,Casilla casillaDestino,bool test = false)
             {
                 var piezaOrigen = casillaOrigen.PiezaContenida;
                 var piezaDesino = casillaDestino.PiezaContenida;
                 if (piezaOrigen.Color != (ColorFicha) CurrentTurn) return Output.NotYourTurn;
-                    casillaDestino.PiezaContenida = casillaOrigen.PiezaContenida;
-                    casillaOrigen.PiezaContenida = null;
-
+                    
                 if (CheckCheck(piezaOrigen.Color))
                 {
                     casillaOrigen.PiezaContenida = piezaOrigen;
                     casillaDestino.PiezaContenida = piezaDesino;
                     return Output.SelfCheck;
                 }
-                if (CheckCheck(piezaOrigen.Color == ColorFicha.Blanco ? ColorFicha.Negro : ColorFicha.Blanco))
-                {
-                    NextTurn();
-                    return Output.Check;
-                }
+                if(test) return Output.Success;;
+
+                casillaDestino.PiezaContenida = casillaOrigen.PiezaContenida;
+                casillaOrigen.PiezaContenida = null;
                 NextTurn();
+                if (CheckCheck(piezaOrigen.Color == ColorFicha.Blanco ? ColorFicha.Negro : ColorFicha.Blanco)) return Output.Check;
                     return Output.Success;
             }
 
+
+            public Output CheckCheckMate(ColorFicha color)
+            {
+                var casillasOfColor = _casillas.Where(casilla => casilla.PiezaContenida != null 
+                    && casilla.PiezaContenida.Color == color);
+                foreach (var casilla in casillasOfColor)
+                {
+                    var posiblesMovimientos = MovementPosibilitiesList(casilla);
+                    foreach (var posiblesMovimiento in posiblesMovimientos)
+                    {
+                        if(MovePiece(casilla, posiblesMovimiento) != Output.SelfCheck)
+                            return Output.Success;
+                    }
+                }
+                return CheckCheck(color) ? Output.CheckMate : Output.StaleMate;
+            }
+            
             private void NextTurn()
             {
                 CurrentTurn = CurrentTurn == ColorJugador.Blanco ? ColorJugador.Negro : ColorJugador.Blanco;
