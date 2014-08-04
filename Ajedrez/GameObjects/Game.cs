@@ -75,7 +75,7 @@ namespace Ajedrez.GameObjects
                 delimitadorFila += "-";
             }            
             
-            for (int fila = 1; fila <= MaxFilas; fila++)
+            for (int fila = MaxFilas; fila >= 1; fila--)
             {
                 //var filaName = diccionarioColumnas[fila];
                 Console.Write("{0}  ", fila);
