@@ -68,14 +68,15 @@ namespace Ajedrez.GameObjects
                     _initialValueSets.Add(new PieceInit(2, columna, ColorFicha.Blanco, TipoPieza.Peon));
                 for (var columna = 1; columna <= MaxColumnas; columna++)
                     _initialValueSets.Add(new PieceInit(7, columna, ColorFicha.Negro, TipoPieza.Peon));
-                _initialValueSets.Add(new PieceInit(1, 1, ColorFicha.Negro, TipoPieza.Torre));
-                _initialValueSets.Add(new PieceInit(1, 2, ColorFicha.Negro, TipoPieza.Caballero));
-                _initialValueSets.Add(new PieceInit(1, 3, ColorFicha.Negro, TipoPieza.Alfil));
-                _initialValueSets.Add(new PieceInit(1, 4, ColorFicha.Negro, TipoPieza.Reina));
-                _initialValueSets.Add(new PieceInit(1, 5, ColorFicha.Negro, TipoPieza.Rey));
-                _initialValueSets.Add(new PieceInit(1, 6, ColorFicha.Negro, TipoPieza.Alfil));
-                _initialValueSets.Add(new PieceInit(1, 7, ColorFicha.Negro, TipoPieza.Caballero));
-                _initialValueSets.Add(new PieceInit(1, 8, ColorFicha.Negro, TipoPieza.Torre));
+
+                _initialValueSets.Add(new PieceInit(1, 1, ColorFicha.Blanco, TipoPieza.Torre));
+                _initialValueSets.Add(new PieceInit(1, 2, ColorFicha.Blanco, TipoPieza.Caballero));
+                _initialValueSets.Add(new PieceInit(1, 3, ColorFicha.Blanco, TipoPieza.Alfil));
+                _initialValueSets.Add(new PieceInit(1, 4, ColorFicha.Blanco, TipoPieza.Reina));
+                _initialValueSets.Add(new PieceInit(1, 5, ColorFicha.Blanco, TipoPieza.Rey));
+                _initialValueSets.Add(new PieceInit(1, 6, ColorFicha.Blanco, TipoPieza.Alfil));
+                _initialValueSets.Add(new PieceInit(1, 7, ColorFicha.Blanco, TipoPieza.Caballero));
+                _initialValueSets.Add(new PieceInit(1, 8, ColorFicha.Blanco, TipoPieza.Torre));
 
                 _initialValueSets.Add(new PieceInit(8, 1, ColorFicha.Negro, TipoPieza.Torre));
                 _initialValueSets.Add(new PieceInit(8, 2, ColorFicha.Negro, TipoPieza.Caballero));
@@ -152,7 +153,7 @@ namespace Ajedrez.GameObjects
                 return GetPiezaDeCasilla(GetCasilla(fila,columna).Id);
             }
 
-            public IEnumerable<Casilla> MovementPosibilitiesList(Casilla casilla)
+            private IEnumerable<Casilla> MovementPosibilitiesList(Casilla casilla)
             {
                 var piezaEnCasilla = casilla.PiezaContenida;
                 return piezaEnCasilla == null ? null : MovimientoPieza(casilla);
@@ -272,8 +273,9 @@ namespace Ajedrez.GameObjects
 
             private Casilla GetKing(ColorFicha color)
             {      
-                return _casillas.FirstOrDefault(casilla => casilla.PiezaContenida.Tipo == (int) TipoPieza.Rey
-                                                        && casilla.PiezaContenida.Color == color);
+                return _casillas.FirstOrDefault(casilla => casilla.PiezaContenida != null 
+                    && (casilla.PiezaContenida.Tipo == (int) TipoPieza.Rey
+                    && casilla.PiezaContenida.Color == color));
             }
 
             private List<Casilla> CasillasEnPeligro(Casilla king)
