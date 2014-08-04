@@ -104,48 +104,89 @@ namespace Ajedrez.GameObjects
             Console.WriteLine("");
         }
 
-
-        public void CoordenadasParaMoverPieza(string casillaOrigen, string casillaDestino) 
-        { 
-            int filaOrigen = 0;
-            int columnaOrigen = 0; 
-            int filaDestino = 0; 
-            int columnaDestino = 0; 
-            convertirCasillaAFilaColumna(ref filaOrigen, ref columnaOrigen, casillaOrigen);
-            convertirCasillaAFilaColumna(ref filaDestino, ref columnaDestino, casillaDestino); 
-        }
-
         private void convertirCasillaAFilaColumna(ref int fila, ref int columna, string casilla)
         {
-            char fil = casilla.ElementAt(0);
-            columna = Convert.ToInt32(casilla.ElementAt(1));
-            switch (Char.ToLower(fil))
+            char col = casilla[0];
+            fila = int.Parse(casilla[1].ToString());
+            switch (Char.ToLower(col))
             {
                 case 'a':
-                    fila = 0;
+                    columna = 1;
                     return;
                 case 'b':
-                    fila = 1;
+                    columna = 2;
                     return;
                 case 'c':
-                    fila = 2;
+                    columna = 3;
                     return;
                 case 'd':
-                    fila = 3;
+                    columna = 4;
                     return;
                 case 'e':
-                    fila = 4;
+                    columna = 5;
                     return;
                 case 'f':
-                    fila = 5;
+                    columna = 6;
                     return;
                 case 'g':
-                    fila = 6;
+                    columna = 7;
                     return;
                 case 'h':
-                    fila = 7;
+                    columna = 8;
                     return;
             }
         }
+
+        private string ConvertirFilaColumnaACasilla(int fila, int columna)
+        {
+            return _diccionarioColumnas[columna] + fila;
+        }
+
+        public void renderGame()
+        {
+            int respuesta = 0;
+            int filaOrigen = 0;
+            int columnaOrigen = 0;
+            int filaDestino = 0;
+            int columnaDestino = 0;
+            Casilla casillaOrigen, casillaDestino;
+            string piezaOrigen, piezaDestino;
+            string colorJugador = "blanco";
+            string respuesta2 = null;
+            do
+            {
+
+
+                do
+                {
+                    DibujarTableroConsola();
+                    Console.WriteLine("Turno del jugador " + colorJugador);
+                    Console.WriteLine("Seleccione la pieza a mover");
+                    piezaOrigen = Console.ReadLine();
+                    convertirCasillaAFilaColumna(ref filaOrigen, ref columnaOrigen, piezaOrigen);
+                    casillaOrigen = _tablero.GetCasilla(filaOrigen, columnaOrigen);
+                    Console.WriteLine("Estas son sus posibles movimientos: ");
+                    foreach (var posibilidades in _tablero.MovementPosibilitiesList(casillaOrigen))
+                        Console.WriteLine(ConvertirFilaColumnaACasilla(posibilidades.Fila, posibilidades.Columna));
+
+                    Console.WriteLine("Que quiere hacer?: ");
+                    Console.WriteLine(" 1. Mover la pieza: ");
+                    Console.WriteLine(" 2. Seleccionar otra pieza: ");
+                    respuesta2 = Console.ReadLine();
+                } while (respuesta2 != "1");
+
+                Console.WriteLine("Seleccione lugar de destino: ");
+                piezaDestino = Console.ReadLine();
+                convertirCasillaAFilaColumna(ref filaDestino, ref columnaDestino, piezaDestino);
+                casillaDestino = _tablero.GetCasilla(filaDestino, columnaDestino);
+                var response = _tablero.MovePiece(casillaOrigen, casillaDestino);
+                Console.WriteLine(response.ToString());
+                if (colorJugador.Equals("blanco"))
+                    colorJugador = "negro";
+                else
+                    colorJugador = "blanco";
+            } while (respuesta != 3);
+        }
     }
 }
+

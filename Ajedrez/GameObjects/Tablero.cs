@@ -154,7 +154,7 @@ namespace Ajedrez.GameObjects
                 return GetPiezaDeCasilla(GetCasilla(fila,columna).Id);
             }
 
-            private IEnumerable<Casilla> MovementPosibilitiesList(Casilla casilla)
+            public IEnumerable<Casilla> MovementPosibilitiesList(Casilla casilla)
             {
                 var piezaEnCasilla = casilla.PiezaContenida;
                 return piezaEnCasilla == null ? null : MovimientoPieza(casilla);
@@ -230,7 +230,9 @@ namespace Ajedrez.GameObjects
             public Output MovePiece(Casilla casillaOrigen,Casilla casillaDestino,bool test = false)
             {
                 var piezaOrigen = casillaOrigen.PiezaContenida;
+                
                 var piezaDesino = casillaDestino.PiezaContenida;
+                
                 if (piezaOrigen.Color != (ColorFicha) CurrentTurn) return Output.NotYourTurn;
                     
                 if (CheckCheck(piezaOrigen.Color))
@@ -244,8 +246,10 @@ namespace Ajedrez.GameObjects
                 casillaDestino.PiezaContenida = casillaOrigen.PiezaContenida;
                 casillaOrigen.PiezaContenida = null;
                 NextTurn();
-                if (CheckCheck(piezaOrigen.Color == ColorFicha.Blanco ? ColorFicha.Negro : ColorFicha.Blanco)) return Output.Check;
-                    return Output.Success;
+                //Hace overflow
+                //if (CheckCheck(piezaOrigen.Color == ColorFicha.Blanco ? ColorFicha.Negro : ColorFicha.Blanco)) return Output.Check;
+                
+                return Output.Success;
             }
 
 
@@ -290,7 +294,8 @@ namespace Ajedrez.GameObjects
             private List<Casilla> CasillasEnPeligro(Casilla king)
             {
                 var colorContrario = king.PiezaContenida.Color == ColorFicha.Blanco ? ColorFicha.Negro : ColorFicha.Blanco;
-                var enemyPieces = _casillas.FindAll(casilla => casilla.PiezaContenida.Color == colorContrario);
+                var enemyPieces = _casillas.FindAll(casilla => casilla.PiezaContenida != null 
+                        && casilla.PiezaContenida.Color == colorContrario);
                 var casillasEnPeligro = new List<Casilla>();
                 foreach (var enemyPiece in enemyPieces)
                 {
@@ -329,15 +334,15 @@ namespace Ajedrez.GameObjects
                 {
                     var enemigoUR = GetCasilla(casilla.Fila + 1, casilla.Columna + 1);
                     var enemigoUL = GetCasilla(casilla.Fila + 1, casilla.Columna - 1);
-                    if (enemigoUL.PiezaContenida != null) returnList.Add(enemigoUL);
-                    if (enemigoUR.PiezaContenida != null) returnList.Add(enemigoUR);
+                    if (enemigoUL != null && enemigoUL.PiezaContenida != null) returnList.Add(enemigoUL);
+                    if (enemigoUR != null && enemigoUR.PiezaContenida != null) returnList.Add(enemigoUR);
                 }
                 else
                 {
                     var enemigoDR = GetCasilla(casilla.Fila - 1, casilla.Columna + 1);
                     var enemigoDL = GetCasilla(casilla.Fila - 1, casilla.Columna - 1);
-                    if (enemigoDL.PiezaContenida != null) returnList.Add(enemigoDL);
-                    if (enemigoDR.PiezaContenida != null) returnList.Add(enemigoDR);
+                    if (enemigoDL != null && enemigoDL.PiezaContenida != null) returnList.Add(enemigoDL);
+                    if (enemigoDR != null && enemigoDR.PiezaContenida != null) returnList.Add(enemigoDR);
                 }
                 return returnList;
             }
