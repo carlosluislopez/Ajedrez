@@ -78,8 +78,8 @@ namespace Ajedrez.GameObjects
             
             for (int fila = 1; fila <= MaxFilas; fila++)
             {
-                var filaName = diccionarioFilas[fila];
-                Console.Write("{0}  ", filaName);
+                //var filaName = diccionarioFilas[fila];
+                Console.Write("{0}  ", fila);
                 for (int col = 1; col <= MaxColumnas; col++)
                 {
                     var casilla = tablero.GetCasilla(fila, col);
@@ -101,7 +101,7 @@ namespace Ajedrez.GameObjects
                 Console.WriteLine(delimitadorFila);
             }
             Console.Write("   ");
-            Console.Write(" 1   2   3   4   5   6   7   8");
+            Console.Write(" A   B   C   D   E   F   G   H");
             Console.WriteLine("");
         }
 
