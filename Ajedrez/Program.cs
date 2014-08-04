@@ -12,7 +12,7 @@ namespace Ajedrez
         static void Main(string[] args)
         {
             var game = new Game();
-            game.renderGame();
+            game.RenderGame();
             Console.ReadLine();
         }
     }

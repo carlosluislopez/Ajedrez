@@ -2,7 +2,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Threading;
 
 namespace Ajedrez.GameObjects
 {
@@ -12,7 +14,7 @@ namespace Ajedrez.GameObjects
         private const int MaxFichas = 24;
         private const int MaxFilas = 8;
         private const int MaxColumnas = 8;
-        private readonly Tablero _tablero;
+        private Tablero _tablero;
         private readonly Dictionary<int, string> _diccionarioColumnas;
 
         public Game()
@@ -104,36 +106,17 @@ namespace Ajedrez.GameObjects
             Console.WriteLine("");
         }
 
-        private void convertirCasillaAFilaColumna(ref int fila, ref int columna, string casilla)
+        private void ConvertirCasillaAFilaColumna(out int fila, out int columna, string casilla)
         {
-            char col = casilla[0];
-            fila = int.Parse(casilla[1].ToString());
-            switch (Char.ToLower(col))
+            var firstChar = casilla[0].ToString(CultureInfo.InvariantCulture);
+            var secondChar = casilla[1].ToString(CultureInfo.InvariantCulture);
+
+            if (int.TryParse(firstChar, out fila))
+                columna = _diccionarioColumnas.FirstOrDefault(pair => pair.Value == secondChar.ToUpper()).Key;
+            else
             {
-                case 'a':
-                    columna = 1;
-                    return;
-                case 'b':
-                    columna = 2;
-                    return;
-                case 'c':
-                    columna = 3;
-                    return;
-                case 'd':
-                    columna = 4;
-                    return;
-                case 'e':
-                    columna = 5;
-                    return;
-                case 'f':
-                    columna = 6;
-                    return;
-                case 'g':
-                    columna = 7;
-                    return;
-                case 'h':
-                    columna = 8;
-                    return;
+                fila = int.Parse(secondChar);
+                columna = _diccionarioColumnas.FirstOrDefault(pair => pair.Value == firstChar.ToUpper()).Key;
             }
         }
 
@@ -142,50 +125,80 @@ namespace Ajedrez.GameObjects
             return _diccionarioColumnas[columna] + fila;
         }
 
-        public void renderGame()
+        public void RenderGame()
         {
             int respuesta = 0;
-            int filaOrigen = 0;
-            int columnaOrigen = 0;
-            int filaDestino = 0;
-            int columnaDestino = 0;
+            int filaDestino;
+            int columnaDestino;
+            int filaOrigen;
+            int columnaOrigen;
             Casilla casillaOrigen, casillaDestino;
             string piezaOrigen, piezaDestino;
-            string colorJugador = "blanco";
-            string respuesta2 = null;
+            IEnumerable<Casilla> posibilitiesList;
             do
             {
-
-
+                string queDeseaHacer;
                 do
                 {
+                    
                     DibujarTableroConsola();
-                    Console.WriteLine("Turno del jugador " + colorJugador);
+                    Console.WriteLine("Turno del jugador " + _tablero.CurrentTurn);
                     Console.WriteLine("Seleccione la pieza a mover");
                     piezaOrigen = Console.ReadLine();
-                    convertirCasillaAFilaColumna(ref filaOrigen, ref columnaOrigen, piezaOrigen);
+                    
+                    ConvertirCasillaAFilaColumna(out filaOrigen, out columnaOrigen, piezaOrigen);
                     casillaOrigen = _tablero.GetCasilla(filaOrigen, columnaOrigen);
-                    Console.WriteLine("Estas son sus posibles movimientos: ");
-                    foreach (var posibilidades in _tablero.MovementPosibilitiesList(casillaOrigen))
-                        Console.WriteLine(ConvertirFilaColumnaACasilla(posibilidades.Fila, posibilidades.Columna));
-
-                    Console.WriteLine("Que quiere hacer?: ");
+                    
+                    posibilitiesList = _tablero.MovementPosibilitiesList(casillaOrigen);
+                    if (posibilitiesList == null)
+                    {
+                        Console.WriteLine("La Casilla es vacia!");
+                        PressAnyKeyToContinue();
+                        queDeseaHacer = "";
+                        continue;
+                    } 
+                    Console.WriteLine("Has seleccionado: " + _tablero.PiezasDictionary[casillaOrigen.PiezaContenida.Tipo]);
+                    Console.WriteLine("Estos son sus posibles movimientos: ");
+                    
+                    foreach (var posibleMove in posibilitiesList)
+                        Console.Write("♦" + ConvertirFilaColumnaACasilla(posibleMove.Fila, posibleMove.Columna) + " ");
+                    
+                    Console.WriteLine("\nQue quiere hacer?: ");
                     Console.WriteLine(" 1. Mover la pieza: ");
                     Console.WriteLine(" 2. Seleccionar otra pieza: ");
-                    respuesta2 = Console.ReadLine();
-                } while (respuesta2 != "1");
+                    queDeseaHacer = Console.ReadLine();
+                } while (queDeseaHacer != "1");
 
                 Console.WriteLine("Seleccione lugar de destino: ");
+                if (posibilitiesList == null || !posibilitiesList.Any())
+                {
+                    Console.WriteLine("No hay movimientos Disponibles");
+                    continue;
+                }
                 piezaDestino = Console.ReadLine();
-                convertirCasillaAFilaColumna(ref filaDestino, ref columnaDestino, piezaDestino);
+                ConvertirCasillaAFilaColumna(out filaDestino, out columnaDestino, piezaDestino);
                 casillaDestino = _tablero.GetCasilla(filaDestino, columnaDestino);
+                if (!posibilitiesList.Contains(casillaDestino))
+                {
+                    Console.WriteLine("Movimiento invalido");
+                    PressAnyKeyToContinue();
+                    continue;
+                }
                 var response = _tablero.MovePiece(casillaOrigen, casillaDestino);
-                Console.WriteLine(response.ToString());
-                if (colorJugador.Equals("blanco"))
-                    colorJugador = "negro";
-                else
-                    colorJugador = "blanco";
+                Console.WriteLine(response + "!");
+                if (response != Output.CheckMate) continue;
+                Console.WriteLine("El ganador es: " + _tablero.NextTurn());
+                PressAnyKeyToContinue();
+                respuesta = 3;
             } while (respuesta != 3);
+            Console.WriteLine("Gracias por jugar!");
+            Console.ReadKey();
+        }
+
+        private static void PressAnyKeyToContinue()
+        {
+            Console.WriteLine("Presiona cualquier tecla para continuar.");
+            Console.ReadKey();
         }
     }
 }

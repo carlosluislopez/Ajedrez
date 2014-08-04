@@ -203,7 +203,7 @@ namespace Ajedrez.GameObjects
                         returnList.AddRange(RangeCheck(casilla, casilla, Direccion.LeftDown,1));
                         returnList.AddRange(RangeCheck(casilla, casilla, Direccion.Left,1));
                         returnList.AddRange(RangeCheck(casilla, casilla, Direccion.LeftUp,1));
-                        returnList.RemoveAll(casilla1 => CasillasEnPeligro(casilla).Contains(casilla1));
+                        //returnList.RemoveAll(casilla1 => CasillasEnPeligro(casilla,true).Contains(casilla1));
                         break;
                 }
                 return returnList;
@@ -246,10 +246,16 @@ namespace Ajedrez.GameObjects
                 casillaDestino.PiezaContenida = casillaOrigen.PiezaContenida;
                 casillaOrigen.PiezaContenida = null;
                 NextTurn();
+                var output = CheckCheckMate(ColorContrario(piezaOrigen));
+                return output != Output.Success
+                    ? output
+                    : (CheckCheck(ColorContrario(piezaOrigen)) ? Output.Check : Output.Success);
                 //Hace overflow
-                //if (CheckCheck(piezaOrigen.Color == ColorFicha.Blanco ? ColorFicha.Negro : ColorFicha.Blanco)) return Output.Check;
-                
-                return Output.Success;
+            }
+
+            private static ColorFicha ColorContrario(Pieza piezaOrigen)
+            {
+                return piezaOrigen.Color == ColorFicha.Blanco ? ColorFicha.Negro : ColorFicha.Blanco;
             }
 
 
@@ -262,16 +268,17 @@ namespace Ajedrez.GameObjects
                     var posiblesMovimientos = MovementPosibilitiesList(casilla);
                     foreach (var posiblesMovimiento in posiblesMovimientos)
                     {
-                        if(MovePiece(casilla, posiblesMovimiento) != Output.SelfCheck)
+                        if(MovePiece(casilla, posiblesMovimiento,true) != Output.SelfCheck)
                             return Output.Success;
                     }
                 }
                 return CheckCheck(color) ? Output.CheckMate : Output.StaleMate;
             }
             
-            private void NextTurn()
+            public ColorJugador NextTurn()
             {
                 CurrentTurn = CurrentTurn == ColorJugador.Blanco ? ColorJugador.Negro : ColorJugador.Blanco;
+                return CurrentTurn;
             }
 
             public ColorJugador CurrentTurn { get; set; }
@@ -291,9 +298,9 @@ namespace Ajedrez.GameObjects
                     && casilla.PiezaContenida.Color == color));
             }
 
-            private List<Casilla> CasillasEnPeligro(Casilla king)
+            private List<Casilla> CasillasEnPeligro(Casilla casillaKing)
             {
-                var colorContrario = king.PiezaContenida.Color == ColorFicha.Blanco ? ColorFicha.Negro : ColorFicha.Blanco;
+                var colorContrario = ColorContrario(casillaKing.PiezaContenida);
                 var enemyPieces = _casillas.FindAll(casilla => casilla.PiezaContenida != null 
                         && casilla.PiezaContenida.Color == colorContrario);
                 var casillasEnPeligro = new List<Casilla>();
@@ -334,18 +341,24 @@ namespace Ajedrez.GameObjects
                 {
                     var enemigoUR = GetCasilla(casilla.Fila + 1, casilla.Columna + 1);
                     var enemigoUL = GetCasilla(casilla.Fila + 1, casilla.Columna - 1);
-                    if (enemigoUL != null && enemigoUL.PiezaContenida != null) returnList.Add(enemigoUL);
-                    if (enemigoUR != null && enemigoUR.PiezaContenida != null) returnList.Add(enemigoUR);
+                    if (IsCapturable(casilla, enemigoUL)) returnList.Add(enemigoUL);
+                    if (IsCapturable(casilla, enemigoUR)) returnList.Add(enemigoUR);
                 }
                 else
                 {
                     var enemigoDR = GetCasilla(casilla.Fila - 1, casilla.Columna + 1);
                     var enemigoDL = GetCasilla(casilla.Fila - 1, casilla.Columna - 1);
-                    if (enemigoDL != null && enemigoDL.PiezaContenida != null) returnList.Add(enemigoDL);
-                    if (enemigoDR != null && enemigoDR.PiezaContenida != null) returnList.Add(enemigoDR);
+                    if (IsCapturable(casilla, enemigoDL)) returnList.Add(enemigoDL);
+                    if (IsCapturable(casilla, enemigoDR)) returnList.Add(enemigoDR);
                 }
                 return returnList;
             }
+
+            private static bool IsCapturable(Casilla casilla, Casilla attackedCasilla)
+            {
+                return attackedCasilla != null && attackedCasilla.PiezaContenida != null && attackedCasilla.PiezaContenida.Color != casilla.PiezaContenida.Color;
+            }
+
             private IEnumerable<Casilla> RangeCheck(Casilla casillaOrigen,Casilla nextCasilla, Direccion direccion,int maximumRange = 9)
             {
                 var returnList = new List<Casilla>();
@@ -414,5 +427,7 @@ namespace Ajedrez.GameObjects
             {
                 return MovementPosibilitiesList(GetCasilla(fila, columna));
             }
+
+
         }
     }
