@@ -10,6 +10,9 @@ namespace Ajedrez
     {
         static void Main(string[] args)
         {
+            var game = new GameObjects.Game();
+            game.DibujarTableroConsola();
+            Console.ReadLine();
         }
     }
 

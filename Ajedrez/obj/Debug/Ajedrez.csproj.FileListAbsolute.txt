@@ -5,3 +5,9 @@ C:\Users\Moriya Shrine\Desktop\AyDdS\Ajedrez\Ajedrez\Ajedrez\bin\Debug\Ajedrez.e
 C:\Users\Moriya Shrine\Desktop\AyDdS\Ajedrez\Ajedrez\Ajedrez\bin\Debug\Ajedrez.pdb
 C:\Users\Moriya Shrine\Desktop\AyDdS\Ajedrez\Ajedrez\Ajedrez\obj\Debug\Ajedrez.exe
 C:\Users\Moriya Shrine\Desktop\AyDdS\Ajedrez\Ajedrez\Ajedrez\obj\Debug\Ajedrez.pdb
+D:\UNITEC\Analisis Sistemas\Ajedrez\Ajedrez\Ajedrez\bin\Debug\Ajedrez.exe.config
+D:\UNITEC\Analisis Sistemas\Ajedrez\Ajedrez\Ajedrez\obj\Debug\Ajedrez.exe
+D:\UNITEC\Analisis Sistemas\Ajedrez\Ajedrez\Ajedrez\obj\Debug\Ajedrez.pdb
+D:\UNITEC\Analisis Sistemas\Ajedrez\Ajedrez\Ajedrez\obj\Debug\Ajedrez.csprojResolveAssemblyReference.cache
+D:\UNITEC\Analisis Sistemas\Ajedrez\Ajedrez\Ajedrez\bin\Debug\Ajedrez.exe
+D:\UNITEC\Analisis Sistemas\Ajedrez\Ajedrez\Ajedrez\bin\Debug\Ajedrez.pdb
