@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Ajedrez.GameObjects;
 
 namespace Ajedrez
 {
@@ -10,6 +11,9 @@ namespace Ajedrez
     {
         static void Main(string[] args)
         {
+            var game = new Game();
+            game.DibujarTableroConsola();
+            Console.ReadLine();
         }
     }
 

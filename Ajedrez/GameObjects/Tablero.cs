@@ -55,7 +55,8 @@ namespace Ajedrez.GameObjects
             {
                 _piezas = new List<Pieza>(MaxFichas);
                 _casillas = new List<Casilla>(MaxCasillas);
-                CurrentTurn = ColorJugador.Blanco;                
+                CurrentTurn = ColorJugador.Blanco;      
+          
                 InicializarPosiciones();
                 CrearCasillas();
                 LlenarCasillas();
@@ -72,7 +73,7 @@ namespace Ajedrez.GameObjects
                 _initialValueSets.Add(new PieceInit(1,2,ColorFicha.Blanco,TipoPieza.Caballero));
                 _initialValueSets.Add(new PieceInit(1,7,ColorFicha.Blanco,TipoPieza.Caballero));
                 _initialValueSets.Add(new PieceInit(1,3,ColorFicha.Blanco,TipoPieza.Alfil));
-                _initialValueSets.Add(new PieceInit(1,7,ColorFicha.Blanco,TipoPieza.Alfil));
+                _initialValueSets.Add(new PieceInit(1,6,ColorFicha.Blanco,TipoPieza.Alfil));
                 _initialValueSets.Add(new PieceInit(1,4,ColorFicha.Blanco,TipoPieza.Reina));
                 _initialValueSets.Add(new PieceInit(1,5,ColorFicha.Blanco,TipoPieza.Rey));
 
@@ -161,7 +162,7 @@ namespace Ajedrez.GameObjects
                 return false;
             }
 
-            public List<Casilla> MovementPosibilitiesList(Casilla casilla)
+            public IEnumerable<Casilla> MovementPosibilitiesList(Casilla casilla)
             {
                 var piezaEnCasilla = casilla.PiezaContenida;
                 return piezaEnCasilla == null ? null : MovimientoPieza(casilla);
@@ -410,7 +411,7 @@ namespace Ajedrez.GameObjects
                 return false;
             }
 
-            public List<Casilla> SelectPiece(int fila,int columna)
+            public IEnumerable<Casilla> SelectPiece(int fila,int columna)
             {
                 return MovementPosibilitiesList(GetCasilla(fila, columna));
             }

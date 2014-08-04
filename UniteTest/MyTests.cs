@@ -24,7 +24,7 @@ namespace UniteTest
             var board = new Tablero();
             var fila = 2;
             var columna = 3;
-            List<Casilla> movesPossible = board.SelectPiece(fila,columna);
+            IEnumerable<Casilla> movesPossible = board.SelectPiece(fila,columna);
             foreach (var casilla in movesPossible)
             {
                 Assert.IsTrue(casilla.Columna == 3);
@@ -38,7 +38,7 @@ namespace UniteTest
             var board = new Tablero();
             var fila = 1;
             var columna = 2;
-            List<Casilla> movesPossible = board.SelectPiece(fila, columna);
+            IEnumerable<Casilla> movesPossible = board.SelectPiece(fila, columna);
             foreach (var casilla in movesPossible)
             {
                 Assert.IsTrue(casilla.Fila == 3);
