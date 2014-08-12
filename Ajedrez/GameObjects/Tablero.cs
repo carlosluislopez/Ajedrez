@@ -250,7 +250,6 @@ namespace Ajedrez.GameObjects
                 return output != Output.Success
                     ? output
                     : (CheckCheck(ColorContrario(piezaOrigen)) ? Output.Check : Output.Success);
-                //Hace overflow
             }
 
             private static ColorFicha ColorContrario(Pieza piezaOrigen)
@@ -365,7 +364,9 @@ namespace Ajedrez.GameObjects
                 if (maximumRange == 0) return returnList;
                 nextCasilla = NextCasilla(casillaOrigen, nextCasilla,direccion);
                 if (nextCasilla == null) return returnList;
-                returnList.Add(nextCasilla);
+                if (casillaOrigen.PiezaContenida.Tipo == (int) TipoPieza.Peon && nextCasilla.PiezaContenida != null)
+                    return returnList;
+                 returnList.Add(nextCasilla);
                 maximumRange--;
                 if(nextCasilla.PiezaContenida == null)
                     returnList.AddRange(RangeCheck(casillaOrigen,nextCasilla,direccion,maximumRange));
